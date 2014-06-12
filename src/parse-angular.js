@@ -6,8 +6,11 @@
 
 		var module = angular.module('parse-angular', []);
 
-		module.run(['$q', '$window', function($q, $window){
+		module.value('parseErrorHandler', function(error, cb) {
+			cb(err);
+		});
 
+		module.run(['$q', '$window', 'parseErrorHandler', function($q, $window, parseErrorHandler){
 
 			// Process only if Parse exist on the global window, do nothing otherwise
 			if (!angular.isUndefined($window.Parse) && angular.isObject($window.Parse)) {
@@ -69,9 +72,9 @@
 								var defer = $q.defer();
 								defer.resolve(data);
 								return defer.promise;
-							}, function(err){
+							}, function(err) {
 								var defer = $q.defer();
-								defer.reject(err);
+								parseErrorHandler(err, defer.reject);
 								return defer.promise;
 							});
 
@@ -94,9 +97,9 @@
 								var defer = $q.defer();
 								defer.resolve(data);
 								return defer.promise;
-							}, function(err){
+							}, function(err) {
 								var defer = $q.defer();
-								defer.reject(err);
+								parseErrorHandler(err, defer.reject);
 								return defer.promise;
 							});
 
